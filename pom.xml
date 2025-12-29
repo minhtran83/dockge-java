@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
          https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    
+
     <groupId>com.louislam</groupId>
     <artifactId>dockge</artifactId>
     <version>1.5.0</version>
     <packaging>jar</packaging>
     <name>Dockge</name>
     <description>Integration tests for Dockge Backend</description>
-    
+
     <properties>
         <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        
+
         <!-- Application Configuration -->
         <dockge.stacks.dir>./stacks</dockge.stacks.dir>
         <dockge.data.dir>./data</dockge.data.dir>
-        
+
         <!-- Dependency Versions -->
         <junit.jupiter.version>5.10.1</junit.jupiter.version>
         <assertj.version>3.24.2</assertj.version>
@@ -27,45 +27,51 @@
         <rest.assured.version>5.4.0</rest.assured.version>
         <jackson.version>2.16.0</jackson.version>
         <json.version>20231013</json.version>
-        
+
         <!-- Plugin Versions -->
         <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
         <maven.exec.plugin.version>3.1.0</maven.exec.plugin.version>
         <maven.surefire.plugin.version>3.2.3</maven.surefire.plugin.version>
     </properties>
-    
+
     <dependencyManagement>
         <dependencies>
+            <!-- JUnit 5 -->
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter</artifactId>
                 <version>${junit.jupiter.version}</version>
             </dependency>
-            
+
+            <!-- AssertJ -->
             <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
                 <version>${assertj.version}</version>
             </dependency>
-            
+
+            <!-- Socket.IO Java Client for Node.js backend -->
             <dependency>
                 <groupId>io.socket</groupId>
                 <artifactId>socket.io-client</artifactId>
                 <version>${socketio.client.version}</version>
             </dependency>
-            
+
+            <!-- REST Assured for API testing -->
             <dependency>
                 <groupId>io.rest-assured</groupId>
                 <artifactId>rest-assured</artifactId>
                 <version>${rest.assured.version}</version>
             </dependency>
-            
+
+            <!-- Jackson for JSON -->
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
                 <version>${jackson.version}</version>
             </dependency>
-            
+
+            <!-- JSON -->
             <dependency>
                 <groupId>org.json</groupId>
                 <artifactId>json</artifactId>
@@ -73,60 +79,69 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-    
+
     <dependencies>
+        <!-- JUnit 5 -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
-        
+
+        <!-- AssertJ -->
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
             <scope>test</scope>
         </dependency>
-        
+
+        <!-- Socket.IO Java Client for Node.js backend -->
         <dependency>
             <groupId>io.socket</groupId>
             <artifactId>socket.io-client</artifactId>
             <scope>test</scope>
         </dependency>
-        
+
+        <!-- REST Assured for API testing -->
         <dependency>
             <groupId>io.rest-assured</groupId>
             <artifactId>rest-assured</artifactId>
             <scope>test</scope>
         </dependency>
-        
+
+        <!-- Jackson for JSON -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <scope>test</scope>
         </dependency>
-        
+
+        <!-- JSON -->
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
-    
+
     <build>
         <pluginManagement>
             <plugins>
+                <!-- Maven Compiler Plugin -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${maven.compiler.plugin.version}</version>
                 </plugin>
-                
+
+                <!-- Maven Exec Plugin for NPM and Backend -->
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>exec-maven-plugin</artifactId>
                     <version>${maven.exec.plugin.version}</version>
                 </plugin>
-                
+
+                <!-- Maven Surefire Plugin for Tests -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
@@ -134,18 +149,20 @@
                 </plugin>
             </plugins>
         </pluginManagement>
-        
+
         <plugins>
+            <!-- Maven Compiler Plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
             </plugin>
-            
+
+            <!-- Maven Exec Plugin for NPM and Backend -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <executions>
-                    <!-- npm install -->
+                    <!-- Install dependencies -->
                     <execution>
                         <id>npm-install</id>
                         <phase>validate</phase>
@@ -160,8 +177,8 @@
                             <workingDirectory>${project.basedir}</workingDirectory>
                         </configuration>
                     </execution>
-                    
-                    <!-- TypeScript check -->
+
+                    <!-- Check TypeScript compilation for backend -->
                     <execution>
                         <id>npm-check-ts</id>
                         <phase>process-resources</phase>
@@ -177,8 +194,8 @@
                             <workingDirectory>${project.basedir}</workingDirectory>
                         </configuration>
                     </execution>
-                    
-                    <!-- Start backend -->
+
+                    <!-- Start backend before tests -->
                     <execution>
                         <id>start-backend</id>
                         <phase>process-test-resources</phase>
@@ -200,8 +217,8 @@
                             </environmentVariables>
                         </configuration>
                     </execution>
-                    
-                    <!-- Wait for backend -->
+
+                    <!-- Wait for backend to be ready -->
                     <execution>
                         <id>wait-for-backend</id>
                         <phase>process-test-resources</phase>
@@ -212,14 +229,15 @@
                             <executable>bash</executable>
                             <arguments>
                                 <argument>-c</argument>
-                                <argument>echo "Waiting for backend..."; sleep 5; for i in {1..30}; do if ps aux | grep -q "npm run dev:backend"; then echo "Backend started"; sleep 3; if curl -s http://localhost:5001 >/dev/null 2>&1; then echo "Backend is ready"; exit 0; fi; fi; done; echo "Backend process started"; exit 0</argument>
+                                <argument>echo "Waiting for backend process to start..."; sleep 5; for i in {1..30}; do if ps aux | grep -q "npm run dev:backend"; then echo "✅ Backend process started!"; sleep 3; if curl -s http://localhost:5001 &gt;/dev/null 2&gt;&amp;1; then echo "✅ Backend is listening on port 5001!"; exit 0; else echo "⚠️  Backend process running but not responding on port 5001 yet (attempt $i)"; sleep 2; fi; fi; done; echo "✅ Backend process started (port check optional)"; exit 0</argument>
                             </arguments>
                             <workingDirectory>${project.basedir}</workingDirectory>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
-            
+
+            <!-- Maven Surefire Plugin for Tests -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -228,7 +246,7 @@
                         <include>**/*Test.java</include>
                     </includes>
                     <systemPropertyVariables>
-                        <TEST_BACKEND_PORT>5001</TEST_BACKEND_PORT>
+                        <TEST_BACKEND_PORT>${TEST_BACKEND_PORT}</TEST_BACKEND_PORT>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
