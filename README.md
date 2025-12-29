@@ -4,7 +4,28 @@
 
 # Dockge
 
+> 🔄 **This is the dockge-java project** - A Spring Boot migration of the original Dockge from Node.js/TypeScript to Java Spring Boot.
+
 A fancy, easy-to-use and reactive self-hosted docker compose.yaml stack-oriented manager.
+
+---
+
+## 📋 Spring Boot Migration
+
+**Migration Status**:
+- **Current Phase**: Phase 0 - Documentation & Preparation
+- **Timeline**: 7-11 weeks (6 phases)
+- **Target**: 100% feature parity with 80%+ test coverage
+
+**Documentation**:
+- [PROJECT_PURPOSE.md](PROJECT_PURPOSE.md) - Vision, rationale, and GraalVM plans
+- [SUCCESS_CRITERIA.md](SUCCESS_CRITERIA.md) - Measurable acceptance criteria
+- [MIGRATION_TO_SPRING_BOOT.md](MIGRATION_TO_SPRING_BOOT.md) - Technical architecture
+- [GitHub Issues #1-#36](https://github.com/minhtran83/dockge-java/issues) - Implementation tasks
+
+For the original Node.js/TypeScript version, see [louislam/dockge](https://github.com/louislam/dockge).
+
+---
 
 [![GitHub Repo stars](https://img.shields.io/github/stars/louislam/dockge?logo=github&style=flat)](https://github.com/louislam/dockge) [![Docker Pulls](https://img.shields.io/docker/pulls/louislam/dockge?logo=docker)](https://hub.docker.com/r/louislam/dockge/tags) [![Docker Image Version (latest semver)](https://img.shields.io/docker/v/louislam/dockge/latest?label=docker%20image%20ver.)](https://hub.docker.com/r/louislam/dockge/tags) [![GitHub last commit (branch)](https://img.shields.io/github/last-commit/louislam/dockge/master?logo=github)](https://github.com/louislam/dockge/commits/master/)
 
