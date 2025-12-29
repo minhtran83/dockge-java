@@ -230,24 +230,16 @@ class DockgeSocketIOTest extends IntegrationTestBase {
         sharedSocket.emit("loginByToken", sharedAuthToken, new Ack() {
             @Override
             public void call(Object... args) {
-                if (args.length > 0 && args[0] instanceof JSONObject) {
-                    JSONObject response = (JSONObject) args[0];
-                    loginFuture.complete(response);
-                }
+                JSONObject response = (JSONObject) args[0];
+                loginFuture.complete(response);
             }
         });
         
-        try {
-            JSONObject response = loginFuture.get(10, TimeUnit.SECONDS);
-            
-            System.out.println("Login by token response: " + response);
-            
-            assertThat(response.getBoolean("ok")).isTrue();
-        } catch (Exception e) {
-            // Token login might not return callback, that's acceptable
-            System.out.println("⚠️  Token login timeout (expected if backend doesn't send callback)");
-            assertThat(e.getMessage()).contains("timeout");
-        }
+        JSONObject response = loginFuture.get(10, TimeUnit.SECONDS);
+        
+        System.out.println("Login by token response: " + response);
+        
+        assertThat(response.getBoolean("ok")).isTrue();
     }
 
     // ========================================================================

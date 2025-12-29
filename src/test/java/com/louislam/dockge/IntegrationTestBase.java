@@ -1,72 +1,91 @@
 package com.louislam.dockge;
 
-import io.socket.client.IO;
-import io.socket.client.Socket;
-import org.junit.jupiter.api.AfterAll;
+import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeAll;
-
-import java.net.URISyntaxException;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+import org.junit.jupiter.api.BeforeEach;
 
 /**
- * Base class for Dockge integration tests
- * Provides Socket.IO connection setup and teardown
+ * Base class for all integration tests.
+ * Can test against either Node.js backend or Spring Boot backend.
+ * 
+ * Set environment variable TEST_BACKEND_PORT to test against running backend.
+ * Default: 5001 (Node.js backend)
  */
-public class IntegrationTestBase {
-    
-    protected static final String BACKEND_HOST = "http://localhost";
-    protected static final int BACKEND_PORT = 5001;
-    protected static Socket socket;
-    
+public abstract class IntegrationTestBase {
+
+    protected static int port;
+    protected static String backendType;
+    protected String baseUrl;
+
     @BeforeAll
-    public static void setUpBase() throws URISyntaxException, InterruptedException {
-        String url = BACKEND_HOST + ":" + BACKEND_PORT;
-        IO.Options options = IO.Options.builder()
-                .setTransports(new String[]{"websocket"})
-                .setReconnection(true)
-                .build();
-        
-        socket = IO.socket(url, options);
-        socket.connect();
-        
-        // Wait for connection
-        CountDownLatch connectLatch = new CountDownLatch(1);
-        socket.on(Socket.EVENT_CONNECT, args -> connectLatch.countDown());
-        
-        if (!connectLatch.await(10, TimeUnit.SECONDS)) {
-            throw new RuntimeException("Failed to connect to backend");
+    public static void setUpOnce() {
+        // Check if testing against external backend (Node.js or running Spring Boot)
+        String portEnv = System.getenv("TEST_BACKEND_PORT");
+        if (portEnv != null && !portEnv.isEmpty()) {
+            port = Integer.parseInt(portEnv);
+            backendType = "external";
+            System.out.println("🔗 Testing against external backend on port: " + port);
+        } else {
+            // Default to Node.js backend port
+            port = 5001;
+            backendType = "nodejs";
+            System.out.println("🔗 Testing against Node.js backend on port: " + port);
         }
     }
-    
-    @AfterAll
-    public static void tearDownBase() {
-        if (socket != null && socket.connected()) {
-            socket.disconnect();
-        }
+
+    @BeforeEach
+    public void setUpBase() {
+        baseUrl = "http://localhost:" + port;
+        RestAssured.port = port;
+        RestAssured.baseURI = "http://localhost";
     }
-    
+
     /**
-     * Emit a Socket.IO event and wait for response
+     * Get the WebSocket URL for testing
      */
-    protected static Object emitAndWait(String event, Object... args) throws InterruptedException {
-        CountDownLatch latch = new CountDownLatch(1);
-        final Object[] response = new Object[1];
-        
-        socket.emit(event, args, new io.socket.client.Ack() {
-            @Override
-            public void call(Object... objects) {
-                if (objects.length > 0) {
-                    response[0] = objects[0];
-                }
-                latch.countDown();
+    protected String getWebSocketUrl() {
+        return "ws://localhost:" + port + "/ws";
+    }
+
+    /**
+     * Get the Socket.IO URL for testing (Node.js backend)
+     */
+    protected String getSocketIOUrl() {
+        return "http://localhost:" + port;
+    }
+
+    /**
+     * Check if testing against Node.js backend
+     */
+    protected boolean isNodeBackend() {
+        return "nodejs".equals(backendType);
+    }
+
+    /**
+     * Check if testing against Spring Boot backend
+     */
+    protected boolean isSpringBackend() {
+        return "spring".equals(backendType);
+    }
+
+    /**
+     * Wait for a condition with timeout
+     */
+    protected void waitForCondition(BooleanSupplier condition, long timeoutMs) throws InterruptedException {
+        long startTime = System.currentTimeMillis();
+        while (!condition.getAsBoolean()) {
+            if (System.currentTimeMillis() - startTime > timeoutMs) {
+                throw new AssertionError("Condition timeout after " + timeoutMs + "ms");
             }
-        });
-        
-        if (!latch.await(5, TimeUnit.SECONDS)) {
-            throw new RuntimeException("Timeout waiting for response to: " + event);
+            Thread.sleep(100);
         }
-        
-        return response[0];
+    }
+
+    /**
+     * Functional interface for boolean suppliers
+     */
+    @FunctionalInterface
+    protected interface BooleanSupplier {
+        boolean getAsBoolean();
     }
 }
