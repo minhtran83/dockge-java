@@ -1,0 +1,43 @@
+-- Initial Schema for Dockge
+
+-- User Table
+CREATE TABLE IF NOT EXISTS dockge_user (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255),
+    email VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Agent Table
+CREATE TABLE IF NOT EXISTS agent (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name VARCHAR(255) NOT NULL,
+    url VARCHAR(255) NOT NULL,
+    scheme VARCHAR(50),
+    authentication TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Stack Table
+CREATE TABLE IF NOT EXISTS stack (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name VARCHAR(255) NOT NULL,
+    compose_content TEXT,
+    environment TEXT,
+    agent_id INTEGER,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (agent_id) REFERENCES agent(id)
+);
+
+-- Setting Table
+CREATE TABLE IF NOT EXISTS setting (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    setting_key VARCHAR(255) NOT NULL UNIQUE,
+    setting_value TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

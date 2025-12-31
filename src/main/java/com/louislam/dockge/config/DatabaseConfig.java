@@ -11,12 +11,17 @@ import org.springframework.context.annotation.Configuration;
  * - Testing: In-memory SQLite
  * - Production: MySQL
  */
-@Configuration
-public class DatabaseConfig {
+import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-    // TODO: Add database-specific configurations
-    // - Connection pooling (HikariCP)
-    // - Dialect selection
-    // - Migration support (Flyway or Liquibase)
-    // This will be implemented in Phase 2
+/**
+ * Database configuration for the Dockge application.
+ * 
+ * Manages database connection settings and JPA/Hibernate configuration.
+ * Transaction management is enabled for the entire application.
+ */
+@Configuration
+@EnableTransactionManagement
+public class DatabaseConfig {
+    // Spring Boot auto-configures HikariCP and JPA based on application.yml
 }
