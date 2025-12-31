@@ -36,7 +36,7 @@ public class SocketIOService {
     }
 
     @OnEvent("setup")
-    public void onSetup(SocketIOClient client, AckRequest ackSender, Object data) {
+    public void onSetup(SocketIOClient client, AckRequest ackSender, String username, String password) {
         Map<String, Object> response = new HashMap<>();
         response.put("ok", true);
         response.put("msg", "Setup successful (Mock)");
@@ -46,9 +46,8 @@ public class SocketIOService {
     }
 
     @OnEvent("login")
-    public void onLogin(SocketIOClient client, AckRequest ackSender, Map<String, Object> data) {
+    public void onLogin(SocketIOClient client, AckRequest ackSender, String username, String password) {
         Map<String, Object> response = new HashMap<>();
-        String password = (String) data.get("password");
         boolean ok = !"wrongpassword".equals(password);
         response.put("ok", ok);
         if (ok) {
@@ -79,7 +78,7 @@ public class SocketIOService {
     }
 
     @OnEvent("agent")
-    public void onAgent(SocketIOClient client, AckRequest ackSender, Object data) {
+    public void onAgent(SocketIOClient client, AckRequest ackSender, Object... args) {
         sendAgentResponse(ackSender);
     }
 
@@ -93,7 +92,7 @@ public class SocketIOService {
     }
 
     @OnEvent("changePassword")
-    public void onChangePassword(SocketIOClient client, AckRequest ackSender, String newPassword) {
+    public void onChangePassword(SocketIOClient client, AckRequest ackSender, String oldPassword, String newPassword) {
         Map<String, Object> response = new HashMap<>();
         response.put("ok", true);
         if (ackSender != null && ackSender.isAckRequested()) {
@@ -102,7 +101,7 @@ public class SocketIOService {
     }
 
     @OnEvent("setSettings")
-    public void onSetSettings(SocketIOClient client, AckRequest ackSender, Object data) {
+    public void onSetSettings(SocketIOClient client, AckRequest ackSender, Object settings, String password) {
         Map<String, Object> response = new HashMap<>();
         response.put("ok", true);
         if (ackSender != null && ackSender.isAckRequested()) {

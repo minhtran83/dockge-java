@@ -76,11 +76,10 @@ public class SpringBootDockgeSocketIOTest {
     public void shouldHandleSetupEvent() throws Exception {
         CompletableFuture<JSONObject> setupFuture = new CompletableFuture<>();
         
-        JSONObject setupData = new JSONObject();
-        setupData.put("username", "admin");
-        setupData.put("password", "TestPassword123!");
+        String username = "admin";
+        String password = "TestPassword123!";
 
-        sharedSocket.emit("setup", setupData, new Ack() {
+        sharedSocket.emit("setup", username, password, new Ack() {
             @Override
             public void call(Object... args) {
                 setupFuture.complete((JSONObject) args[0]);
@@ -96,11 +95,10 @@ public class SpringBootDockgeSocketIOTest {
     public void shouldLoginWithValidCredentials() throws Exception {
         CompletableFuture<JSONObject> loginFuture = new CompletableFuture<>();
         
-        JSONObject loginData = new JSONObject();
-        loginData.put("username", "admin");
-        loginData.put("password", "TestPassword123!");
+        String username = "admin";
+        String password = "TestPassword123!";
 
-        sharedSocket.emit("login", loginData, new Ack() {
+        sharedSocket.emit("login", username, password, new Ack() {
             @Override
             public void call(Object... args) {
                 loginFuture.complete((JSONObject) args[0]);
@@ -118,11 +116,10 @@ public class SpringBootDockgeSocketIOTest {
     public void shouldRejectInvalidCredentials() throws Exception {
         CompletableFuture<JSONObject> loginFuture = new CompletableFuture<>();
         
-        JSONObject loginData = new JSONObject();
-        loginData.put("username", "admin");
-        loginData.put("password", "wrongpassword");
+        String username = "admin";
+        String password = "wrongpassword";
 
-        sharedSocket.emit("login", loginData, new Ack() {
+        sharedSocket.emit("login", username, password, new Ack() {
             @Override
             public void call(Object... args) {
                 loginFuture.complete((JSONObject) args[0]);
