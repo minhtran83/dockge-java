@@ -1,37 +1,34 @@
 package com.louislam.dockge;
 
 import io.restassured.RestAssured;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.List;
 
 /**
  * Base class for all integration tests.
- * Can test against either Node.js backend or Spring Boot backend.
- * 
- * Set environment variable TEST_BACKEND_PORT to test against running backend.
- * Default: 5001 (Node.js backend)
+ * Uses Spring Boot Test to bootstrap the application context.
  */
+import org.springframework.boot.test.web.server.LocalServerPort;
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("test")
 public abstract class IntegrationTestBase {
 
-    protected static int port;
-    protected static String backendType;
-    protected String baseUrl;
+    @LocalServerPort
+    protected int port;
 
-    @BeforeAll
-    public static void setUpOnce() {
-        // Check if testing against external backend (Node.js or running Spring Boot)
-        String portEnv = System.getenv("TEST_BACKEND_PORT");
-        if (portEnv != null && !portEnv.isEmpty()) {
-            port = Integer.parseInt(portEnv);
-            backendType = "external";
-            System.out.println("🔗 Testing against external backend on port: " + port);
-        } else {
-            // Default to Node.js backend port
-            port = 5001;
-            backendType = "nodejs";
-            System.out.println("🔗 Testing against Node.js backend on port: " + port);
-        }
-    }
+    @Value("${socket-io.port:5051}")
+    protected int socketIOPort;
+
+    @Autowired
+    protected List<JpaRepository<?, ?>> repositories;
+
+    protected String baseUrl;
 
     @BeforeEach
     public void setUpBase() {
@@ -48,24 +45,25 @@ public abstract class IntegrationTestBase {
     }
 
     /**
-     * Get the Socket.IO URL for testing (Node.js backend)
+     * Get the Socket.IO URL for testing
      */
     protected String getSocketIOUrl() {
-        return "http://localhost:" + port;
+        return "http://localhost:" + socketIOPort;
     }
 
     /**
-     * Check if testing against Node.js backend
+     * Clear all data from the database
      */
-    protected boolean isNodeBackend() {
-        return "nodejs".equals(backendType);
-    }
-
-    /**
-     * Check if testing against Spring Boot backend
-     */
-    protected boolean isSpringBackend() {
-        return "spring".equals(backendType);
+    protected void clearDatabase() {
+        // Delete in reverse order of dependencies if necessary, 
+        // but deleteAllInBatch is generally faster and handles constraints if configured correctly
+        repositories.forEach(repo -> {
+            try {
+                repo.deleteAllInBatch();
+            } catch (Exception e) {
+                repo.deleteAll();
+            }
+        });
     }
 
     /**
