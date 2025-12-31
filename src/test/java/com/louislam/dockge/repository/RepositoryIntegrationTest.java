@@ -46,13 +46,14 @@ public class RepositoryIntegrationTest {
     @Test
     public void testAgentCRUD() {
         Agent agent = new Agent();
-        agent.setName("local-agent");
         agent.setUrl("http://localhost:5001");
+        agent.setUsername("admin");
+        agent.setPassword("password");
         agentRepository.save(agent);
 
-        Optional<Agent> found = agentRepository.findByName("local-agent");
+        Optional<Agent> found = agentRepository.findByUrl("http://localhost:5001");
         assertThat(found).isPresent();
-        assertThat(found.get().getName()).isEqualTo("local-agent");
+        assertThat(found.get().getUrl()).isEqualTo("http://localhost:5001");
     }
 
     @Test
