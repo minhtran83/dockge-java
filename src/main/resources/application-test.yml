@@ -11,7 +11,10 @@ spring:
     locations: classpath:db/migration/h2
 
 server:
-  port: 5001
+  port: 5050
+
+socket-io:
+  port: 5051
 
 logging:
   level:
