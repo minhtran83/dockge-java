@@ -39,7 +39,7 @@ jobs:
         run: npm run check-ts
       
       - name: Run integration tests
-        run: mvn clean test
+        run: mvn clean test -P integration-tests
         env:
           DOCKGE_STACKS_DIR: ./stacks
           DOCKGE_DATA_DIR: ./data
