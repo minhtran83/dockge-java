@@ -1,21 +1,19 @@
 package com.louislam.dockge.model;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 /**
  * User entity representing a Dockge user.
  * 
- * TODO: Complete implementation in Phase 2
- * - Add fields: username, passwordHash, email, createdAt, updatedAt
- * - Add authentication-related fields
- */
-import jakarta.persistence.*;
-import java.time.LocalDateTime;
-
-/**
- * User entity representing a Dockge user.
+ * Matches original Knex migration schema.
  */
 @Entity
-@Table(name = "dockge_user")
+@Table(name = "`user`" ) // Quoted as user is a reserved word
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,62 +25,42 @@ public class User {
     @Column(name = "password", nullable = false)
     private String passwordHash;
 
-    private String email;
+    @Column(nullable = false)
+    private boolean active = true;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    private String timezone;
 
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    @Column(name = "twofa_secret", length = 64)
+    private String twofaSecret;
 
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
+    @Column(name = "twofa_status", nullable = false)
+    private boolean twofaStatus = false;
 
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
+    @Column(name = "twofa_last_token", length = 6)
+    private String twofaLastToken;
 
-    public Long getId() {
-        return id;
-    }
+    // Standard getters and setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
 
-    public String getUsername() {
-        return username;
-    }
+    public String getPasswordHash() { return passwordHash; }
+    public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
+    public boolean isActive() { return active; }
+    public void setActive(boolean active) { this.active = active; }
 
-    public String getPasswordHash() {
-        return passwordHash;
-    }
+    public String getTimezone() { return timezone; }
+    public void setTimezone(String timezone) { this.timezone = timezone; }
 
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
-    }
+    public String getTwofaSecret() { return twofaSecret; }
+    public void setTwofaSecret(String twofaSecret) { this.twofaSecret = twofaSecret; }
 
-    public String getEmail() {
-        return email;
-    }
+    public boolean isTwofaStatus() { return twofaStatus; }
+    public void setTwofaStatus(boolean twofaStatus) { this.twofaStatus = twofaStatus; }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
+    public String getTwofaLastToken() { return twofaLastToken; }
+    public void setTwofaLastToken(String twofaLastToken) { this.twofaLastToken = twofaLastToken; }
 }
