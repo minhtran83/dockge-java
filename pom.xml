@@ -37,6 +37,7 @@
         <sqlite.jdbc.version>3.45.1.0</sqlite.jdbc.version>
         <postgresql.version>42.7.2</postgresql.version>
         <flyway.version>9.22.3</flyway.version>
+        <netty-socketio.version>2.0.6</netty-socketio.version>
         <pty4j.version>0.12.13</pty4j.version>
         <jjwt.version>0.12.3</jjwt.version>
         <snakeyaml.version>2.2</snakeyaml.version>
@@ -92,6 +93,13 @@
                 <version>${flyway.version}</version>
             </dependency>
 
+            <!-- Socket.IO Server -->
+            <dependency>
+                <groupId>com.corundumstudio.socketio</groupId>
+                <artifactId>netty-socketio</artifactId>
+                <version>${netty-socketio.version}</version>
+            </dependency>
+
             <!-- JWT -->
             <dependency>
                 <groupId>io.jsonwebtoken</groupId>
@@ -123,6 +131,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.corundumstudio.socketio</groupId>
+            <artifactId>netty-socketio</artifactId>
         </dependency>
 
         <dependency>
