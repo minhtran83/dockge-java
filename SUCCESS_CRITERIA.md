@@ -46,7 +46,7 @@ This document defines measurable, achievable success criteria for the dockge-jav
 **Criterion**: Database schema and data are preserved and compatible
 
 - [ ] SQLite support fully functional
-- [ ] MySQL support fully functional
+- [ ] PostgreSQL support fully functional
 - [ ] Existing data migrations work correctly
 - [ ] New migrations follow Flyway standards
 - [ ] Database rollback procedures tested

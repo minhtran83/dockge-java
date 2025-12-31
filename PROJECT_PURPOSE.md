@@ -18,7 +18,7 @@ Dockge is a **fancy, easy-to-use and reactive self-hosted Docker Compose manager
 **Current Stack**:
 - **Backend**: Node.js with TypeScript and Socket.IO
 - **Frontend**: Vue.js
-- **Database**: SQLite (with MySQL support)
+- **Database**: SQLite (with PostgreSQL support)
 - **Deployment**: Docker containers
 
 ---
@@ -104,7 +104,7 @@ Spring Boot migration provides:
 
 4. **Preserve Compatibility**
    - Frontend remains Vue.js (unchanged)
-   - Database remains SQLite/MySQL compatible
+   - Database remains SQLite/PostgreSQL compatible
    - WebSocket interface compatible with existing clients
 
 ---
@@ -142,7 +142,7 @@ Spring Boot migration provides:
 
 2. **Data Layer**
    - Spring Data JPA with Hibernate
-   - SQLite for development, MySQL for production
+   - SQLite for development, PostgreSQL for production
    - Flyway for schema migrations
 
 3. **Real-Time Communication**

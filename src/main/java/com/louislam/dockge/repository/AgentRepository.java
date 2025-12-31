@@ -1,14 +1,11 @@
 package com.louislam.dockge.repository;
 
 import com.louislam.dockge.model.Agent;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import java.util.Optional;
 
-/**
- * Spring Data JPA repository for Agent entities.
- * 
- * Provides database access methods for agent-related operations.
- */
-public interface AgentRepository { // extends JpaRepository<Agent, Long> {
-    // TODO: Add custom query methods in Phase 2
-    // - findByName(String name)
+@Repository
+public interface AgentRepository extends JpaRepository<Agent, Long> {
+    Optional<Agent> findByUrl(String url);
 }

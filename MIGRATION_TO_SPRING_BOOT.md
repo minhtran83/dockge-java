@@ -24,7 +24,7 @@ This document outlines the plan to migrate the Dockge backend from Node.js/TypeS
 | **Stack** | `stack.ts` | Docker Compose management | ✅ Working |
 | **AgentManager** | `agent-manager.ts` | Multi-agent management | ✅ Working |
 | **Terminal** | `terminal.ts` | PTY terminal emulation | ✅ Working |
-| **Database** | `database.ts` | SQLite/MySQL abstraction | ✅ Working |
+| **Database** | `database.ts` | SQLite/PostgreSQL abstraction | ✅ Working |
 | **SocketHandler** | `main-socket-handler.ts` | WebSocket events | ✅ Working |
 | **Settings** | `settings.ts` | Application settings | ✅ Working |
 | **Models** | `models/*.ts` | User, Agent models | ✅ Working |

@@ -13,12 +13,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * This is the main application class that bootstraps the Spring Boot container.
  * It enables component scanning, auto-configuration, scheduling, and async support.
  */
-/**
- * Spring Boot entry point for the Dockge application.
- * 
- * This is the main application class that bootstraps the Spring Boot container.
- * It enables component scanning, auto-configuration, scheduling, and async support.
- */
 @SpringBootApplication
 @EnableScheduling
 @EnableAsync

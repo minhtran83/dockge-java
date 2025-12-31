@@ -10,7 +10,11 @@ import java.util.Optional;
  * 
  * Provides database access methods for application settings.
  */
-public interface SettingRepository { // extends JpaRepository<Setting, Long> {
-    // TODO: Add custom query methods in Phase 2
-    // - findByKey(String key)
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import java.util.Optional;
+
+@Repository
+public interface SettingRepository extends JpaRepository<Setting, Long> {
+    Optional<Setting> findByKey(String key);
 }
