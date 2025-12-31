@@ -1,34 +1,44 @@
 package com.louislam.dockge;
 
 import io.restassured.RestAssured;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
-import java.util.List;
 
 /**
  * Base class for all integration tests.
- * Uses Spring Boot Test to bootstrap the application context.
+ * Can test against either Node.js backend or Spring Boot backend.
  */
-import org.springframework.boot.test.web.server.LocalServerPort;
-
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
 public abstract class IntegrationTestBase {
 
-    @LocalServerPort
-    protected int port;
-
-    @Value("${socket-io.port:5051}")
-    protected int socketIOPort;
-
-    @Autowired
-    protected List<JpaRepository<?, ?>> repositories;
-
+    protected static int port;
+    protected static String backendType;
     protected String baseUrl;
+
+    @BeforeAll
+    public static void setUpOnce() {
+        // Use system property first (passed from Maven), then env var, then default
+        String portProp = System.getProperty("TEST_BACKEND_PORT");
+        if (portProp == null || portProp.isEmpty() || "${TEST_BACKEND_PORT}".equals(portProp)) {
+            portProp = System.getenv("TEST_BACKEND_PORT");
+        }
+
+        if (portProp != null && !portProp.isEmpty() && !"${TEST_BACKEND_PORT}".equals(portProp)) {
+            port = Integer.parseInt(portProp);
+            backendType = "external";
+            System.out.println("🔗 Testing against external backend on port: " + port);
+        } else {
+            // Check if we are running in Spring Boot context (port will be set by subclass)
+            if (port == 0) {
+                // Default to Node.js backend port
+                port = 5001;
+                backendType = "nodejs";
+                System.out.println("🔗 Testing against Node.js backend on port: " + port);
+            } else {
+                backendType = "spring";
+                System.out.println("🔗 Testing against Spring Boot backend on port: " + port);
+            }
+        }
+    }
 
     @BeforeEach
     public void setUpBase() {
@@ -48,22 +58,9 @@ public abstract class IntegrationTestBase {
      * Get the Socket.IO URL for testing
      */
     protected String getSocketIOUrl() {
-        return "http://localhost:" + socketIOPort;
-    }
-
-    /**
-     * Clear all data from the database
-     */
-    protected void clearDatabase() {
-        // Delete in reverse order of dependencies if necessary, 
-        // but deleteAllInBatch is generally faster and handles constraints if configured correctly
-        repositories.forEach(repo -> {
-            try {
-                repo.deleteAllInBatch();
-            } catch (Exception e) {
-                repo.deleteAll();
-            }
-        });
+        // If testing against Spring Boot, use the specific socket-io port if known
+        // Otherwise use the main port
+        return "http://localhost:" + port;
     }
 
     /**
@@ -85,5 +82,13 @@ public abstract class IntegrationTestBase {
     @FunctionalInterface
     protected interface BooleanSupplier {
         boolean getAsBoolean();
+    }
+
+    protected boolean isNodeBackend() {
+        return "nodejs".equals(backendType);
+    }
+
+    protected boolean isSpringBackend() {
+        return "spring".equals(backendType);
     }
 }

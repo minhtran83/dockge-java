@@ -23,7 +23,7 @@ import org.springframework.test.annotation.DirtiesContext;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-class DockgeSocketIOTest extends IntegrationTestBase {
+class DockgeSocketIOTest extends SpringBootIntegrationTestBase {
 
     private static Socket sharedSocket;
     private static String sharedAuthToken;
