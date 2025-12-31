@@ -3,7 +3,6 @@ spring:
     url: "jdbc:sqlite:memory:"
     driver-class-name: org.sqlite.JDBC
   jpa:
-    database-platform: org.hibernate.dialect.SQLiteDialect
     hibernate:
       ddl-auto: create-drop
     show-sql: false
