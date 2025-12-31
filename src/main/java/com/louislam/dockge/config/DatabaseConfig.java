@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
  * Supports multiple databases:
  * - Development: SQLite (default)
  * - Testing: In-memory SQLite
- * - Production: MySQL
+ * - Production: PostgreSQL
  */
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
