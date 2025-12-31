@@ -784,8 +784,12 @@ class DockgeSocketIOTest extends IntegrationTestBase {
             @Override
             public void call(Object... args) {
                 JSONObject response = (JSONObject) args[0];
-                boolean exists = response.getBoolean("ok");
-                existsFuture.complete(exists);
+                try {
+                    boolean exists = response.getBoolean("ok");
+                    existsFuture.complete(exists);
+                } catch (Exception e) {
+                    existsFuture.complete(false);
+                }
             }
         });
         
