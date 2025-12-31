@@ -13,7 +13,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
  * server and clients. Supports STOMP protocol over WebSocket.
  */
 @Configuration
-@EnableWebSocketMessageBroker
+// @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     /**
