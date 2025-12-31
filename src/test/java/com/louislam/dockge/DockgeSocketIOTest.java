@@ -19,21 +19,15 @@ import static org.assertj.core.api.Assertions.assertThat;
  * 
  * Tests all 17 Socket.IO events that the backend supports.
  */
-import org.springframework.test.annotation.DirtiesContext;
-
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-class DockgeSocketIOTest extends SpringBootIntegrationTestBase {
+public abstract class DockgeSocketIOTest extends IntegrationTestBase {
 
-    private static Socket sharedSocket;
-    private static String sharedAuthToken;
-    private static boolean isConnected = false;
+    protected static Socket sharedSocket;
+    protected static String sharedAuthToken;
+    protected static boolean isConnected = false;
 
     @BeforeEach
-    void setUp() throws Exception {
-        // Ensure database is clean for the first test if needed
-        // clearDatabase();
-        
+    public void setUp() throws Exception {
         // Reuse connection across tests to avoid rate limiting
         if (sharedSocket == null || !sharedSocket.connected()) {
             IO.Options options = new IO.Options();
