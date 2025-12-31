@@ -20,22 +20,24 @@ public abstract class SpringBootIntegrationTestBase extends IntegrationTestBase 
     protected int localPort;
 
     @Value("${socket-io.port:5051}")
-    protected int socketIOPort;
+    protected int springSocketIOPort;
 
     @Autowired
     protected List<JpaRepository<?, ?>> repositories;
 
     @BeforeEach
-    public void setUpSpringBoot() {
-        // Sync the static port in parent class with the random port from Spring Boot
-        port = localPort;
-        backendType = "spring";
-        super.setUpBase();
+    @Override
+    public void setUpBase() {
+        // Sync the instance port with the random port from Spring Boot
+        this.port = localPort;
+        
+        baseUrl = "http://localhost:" + port;
+        io.restassured.RestAssured.port = port;
+        io.restassured.RestAssured.baseURI = "http://localhost";
     }
 
-    @Override
-    protected String getSocketIOUrl() {
-        return "http://localhost:" + socketIOPort;
+    protected String getSpringSocketIOUrl() {
+        return "http://localhost:" + springSocketIOPort;
     }
 
     /**

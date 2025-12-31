@@ -1,11 +1,15 @@
-package com.louislam.dockge;
+package com.louislam.dockge.springboot;
 
-import com.louislam.dockge.IntegrationTestBase;
+import com.louislam.dockge.config.SocketIOConfig;
 import io.socket.client.Ack;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import org.json.JSONObject;
 import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -13,11 +17,17 @@ import java.util.concurrent.TimeUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Complete integration tests for Dockge via Socket.IO.
+ * Integration tests for the new Spring Boot backend.
  */
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("test")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class DockgeSocketIOTest extends IntegrationTestBase {
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+public class SpringBootDockgeSocketIOTest {
+
+    @Autowired
+    private SocketIOConfig socketIOConfig;
 
     protected Socket sharedSocket;
     protected String sharedAuthToken;
@@ -25,15 +35,14 @@ public class DockgeSocketIOTest extends IntegrationTestBase {
 
     @BeforeEach
     public void setUp() throws Exception {
-        super.setUpBase();
-        
         if (sharedSocket == null || !sharedSocket.connected()) {
             IO.Options options = new IO.Options();
             options.forceNew = true;
             options.reconnection = false;
             options.timeout = 5000;
             
-            sharedSocket = IO.socket(getSocketIOUrl(), options);
+            int port = socketIOConfig.getPort();
+            sharedSocket = IO.socket("http://localhost:" + port, options);
             isConnected = false;
         }
     }
