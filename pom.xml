@@ -35,7 +35,8 @@
         <jackson.version>2.16.0</jackson.version>
         <json.version>20231013</json.version>
         <sqlite.jdbc.version>3.45.1.0</sqlite.jdbc.version>
-        <mysql.connector.version>8.2.0</mysql.connector.version>
+        <postgresql.version>42.7.2</postgresql.version>
+        <flyway.version>9.22.3</flyway.version>
         <pty4j.version>0.12.13</pty4j.version>
         <jjwt.version>0.12.3</jjwt.version>
         <snakeyaml.version>2.2</snakeyaml.version>
@@ -76,11 +77,19 @@
                 <version>${sqlite.jdbc.version}</version>
             </dependency>
 
-            <!-- MySQL Connector -->
+            <!-- PostgreSQL Driver -->
             <dependency>
-                <groupId>com.mysql</groupId>
-                <artifactId>mysql-connector-j</artifactId>
-                <version>${mysql.connector.version}</version>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${postgresql.version}</version>
+            </dependency>
+
+
+            <!-- Flyway -->
+            <dependency>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-core</artifactId>
+                <version>${flyway.version}</version>
             </dependency>
 
             <!-- JWT -->
@@ -116,13 +125,10 @@
             <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
 
-        <!-- Moved to jpa profile to allow application to start without DB setup -->
-        <!--
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
-        -->
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -141,9 +147,22 @@
         </dependency>
 
         <dependency>
-            <groupId>com.mysql</groupId>
-            <artifactId>mysql-connector-j</artifactId>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
+
 
 
         <!-- JWT -->
