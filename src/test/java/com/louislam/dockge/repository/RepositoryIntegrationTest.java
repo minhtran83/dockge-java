@@ -1,0 +1,80 @@
+package com.louislam.dockge.repository;
+
+import com.louislam.dockge.model.User;
+import com.louislam.dockge.model.Agent;
+import com.louislam.dockge.model.Stack;
+import com.louislam.dockge.model.Setting;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+@SpringBootTest
+@ActiveProfiles("test")
+@Transactional
+public class RepositoryIntegrationTest {
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private AgentRepository agentRepository;
+
+    @Autowired
+    private StackRepository stackRepository;
+
+    @Autowired
+    private SettingRepository settingRepository;
+
+    @Test
+    public void testUserCRUD() {
+        User user = new User();
+        user.setUsername("testuser");
+        user.setPasswordHash("hash");
+        userRepository.save(user);
+
+        Optional<User> found = userRepository.findByUsername("testuser");
+        assertThat(found).isPresent();
+        assertThat(found.get().getUsername()).isEqualTo("testuser");
+    }
+
+    @Test
+    public void testAgentCRUD() {
+        Agent agent = new Agent();
+        agent.setName("local-agent");
+        agent.setUrl("http://localhost:5001");
+        agentRepository.save(agent);
+
+        Optional<Agent> found = agentRepository.findByName("local-agent");
+        assertThat(found).isPresent();
+        assertThat(found.get().getName()).isEqualTo("local-agent");
+    }
+
+    @Test
+    public void testStackCRUD() {
+        Stack stack = new Stack();
+        stack.setName("test-stack");
+        stackRepository.save(stack);
+
+        Optional<Stack> found = stackRepository.findByName("test-stack");
+        assertThat(found).isPresent();
+        assertThat(found.get().getName()).isEqualTo("test-stack");
+    }
+
+    @Test
+    public void testSettingCRUD() {
+        Setting setting = new Setting();
+        setting.setKey("theme");
+        setting.setValue("dark");
+        settingRepository.save(setting);
+
+        Optional<Setting> found = settingRepository.findByKey("theme");
+        assertThat(found).isPresent();
+        assertThat(found.get().getValue()).isEqualTo("dark");
+    }
+}
