@@ -1,7 +1,6 @@
 package com.louislam.dockge.repository;
 
 import com.louislam.dockge.model.Agent;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -9,8 +8,7 @@ import org.springframework.stereotype.Repository;
  * 
  * Provides database access methods for agent-related operations.
  */
-@Repository
-public interface AgentRepository extends JpaRepository<Agent, Long> {
+public interface AgentRepository { // extends JpaRepository<Agent, Long> {
     // TODO: Add custom query methods in Phase 2
     // - findByName(String name)
 }
