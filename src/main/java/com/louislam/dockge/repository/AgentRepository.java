@@ -8,7 +8,11 @@ import org.springframework.stereotype.Repository;
  * 
  * Provides database access methods for agent-related operations.
  */
-public interface AgentRepository { // extends JpaRepository<Agent, Long> {
-    // TODO: Add custom query methods in Phase 2
-    // - findByName(String name)
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import java.util.Optional;
+
+@Repository
+public interface AgentRepository extends JpaRepository<Agent, Long> {
+    Optional<Agent> findByName(String name);
 }

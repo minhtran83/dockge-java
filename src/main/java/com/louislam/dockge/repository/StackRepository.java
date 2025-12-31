@@ -8,8 +8,13 @@ import org.springframework.stereotype.Repository;
  * 
  * Provides database access methods for stack-related operations.
  */
-public interface StackRepository { // extends JpaRepository<Stack, Long> {
-    // TODO: Add custom query methods in Phase 2
-    // - findByName(String name)
-    // - findByAgentId(Long agentId)
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface StackRepository extends JpaRepository<Stack, Long> {
+    Optional<Stack> findByName(String name);
+    List<Stack> findByAgentId(Long agentId);
 }

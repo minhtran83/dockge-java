@@ -10,8 +10,12 @@ import java.util.Optional;
  * 
  * Provides database access methods for user-related operations.
  */
-public interface UserRepository { // extends JpaRepository<User, Long> {
-    // TODO: Add custom query methods in Phase 2
-    // - findByUsername(String username)
-    // - existsByUsername(String username)
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import java.util.Optional;
+
+@Repository
+public interface UserRepository extends JpaRepository<User, Long> {
+    Optional<User> findByUsername(String username);
+    boolean existsByUsername(String username);
 }
