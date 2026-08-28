@@ -18,7 +18,7 @@ spring:
     locations: classpath:db/migration/postgresql
 
 server:
-  port: 5001
+  port: 5000
   compression:
     enabled: true
     min-response-size: 1024

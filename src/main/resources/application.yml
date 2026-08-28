@@ -24,8 +24,12 @@ spring:
     locations: classpath:db/migration/sqlite
 
 server:
-  port: 5001
+  port: 5000
   shutdown: graceful
+
+socket-io:
+  host: 0.0.0.0
+  port: 5001
 
 management:
   endpoints:

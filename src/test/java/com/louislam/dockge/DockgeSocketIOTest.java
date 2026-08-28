@@ -247,10 +247,9 @@ class DockgeSocketIOTest extends IntegrationTestBase {
     // ========================================================================
 
     @Test
-    @Order(10)
-    @DisplayName("Should get settings")
+    @Order(6)
+    @DisplayName("Should get application settings")
     void shouldGetSettings() throws Exception {
-        // Login first
         loginAndConnect();
         
         CompletableFuture<JSONObject> settingsFuture = new CompletableFuture<>();
@@ -262,145 +261,105 @@ class DockgeSocketIOTest extends IntegrationTestBase {
                 settingsFuture.complete(response);
             }
         });
-        
+
         JSONObject response = settingsFuture.get(10, TimeUnit.SECONDS);
-        
-        System.out.println("Settings response: " + response);
-        
-        assertThat(response.getBoolean("ok"))
-            .withFailMessage("Settings request failed: " + response.optString("msg", "Unknown error"))
-            .isTrue();
-        // Response has "data" field containing settings
-        assertThat(response.has("data"))
-            .withFailMessage("Response missing 'data' field. Response: " + response)
-            .isTrue();
+        assertThat(response.getBoolean("ok")).isTrue();
+        assertThat(response.has("data")).isTrue();
+        System.out.println("✅ Settings retrieved: " + response.get("data"));
     }
 
     // ========================================================================
-    // STACK MANAGEMENT TESTS
+    // STACK OPERATIONS
     // ========================================================================
 
     @Test
-    @Order(20)
-    @DisplayName("Should get stack list via agent")
+    @Order(7)
+    @DisplayName("Should get stack list from agent")
     void shouldGetStackList() throws Exception {
         loginAndConnect();
         
-        CompletableFuture<JSONObject> stackListFuture = new CompletableFuture<>();
+        CompletableFuture<JSONObject> listFuture = new CompletableFuture<>();
         
-        // Note: Stack operations use "agent" proxy pattern
-        // Format: sharedSocket.emit("agent", endpoint, event, ...args, callback)
-        // For local operations, endpoint is empty string ""
-        sharedSocket.emit("agent", "", "requestStackList", new Ack() {
+        // Emits 'agent' event which proxies to the local agent logic
+        sharedSocket.emit("agent", "", "getStackList", new Ack() {
             @Override
             public void call(Object... args) {
                 JSONObject response = (JSONObject) args[0];
-                stackListFuture.complete(response);
+                listFuture.complete(response);
             }
         });
-        
-        JSONObject response = stackListFuture.get(10, TimeUnit.SECONDS);
-        
-        System.out.println("Stack list response: " + response);
-        
-        // The response is just {"ok":true,"msg":"Updated"} 
-        // The actual stack list comes via a different event or the data structure is different
+
+        JSONObject response = listFuture.get(10, TimeUnit.SECONDS);
         assertThat(response.getBoolean("ok")).isTrue();
-        
-        // Stack list might not be in the response, just verify the operation succeeded
+        System.out.println("✅ Stack list retrieved");
     }
 
     @Test
-    @Order(21)
-    @DisplayName("Should create a new stack")
+    @Order(8)
+    @DisplayName("Should create and save a new stack")
     void shouldCreateStack() throws Exception {
         loginAndConnect();
         
-        String stackName = "test-integration-stack";
-        String composeYAML = """
+        CompletableFuture<JSONObject> createFuture = new CompletableFuture<>();
+        
+        String stackName = "integration-test-stack";
+        String composeContent = """
             version: "3.8"
             services:
-              nginx:
+              web:
                 image: nginx:alpine
                 ports:
                   - "8080:80"
             """;
-        
-        // First, delete the stack if it exists (from previous test run)
-        CompletableFuture<JSONObject> deleteFuture = new CompletableFuture<>();
-        sharedSocket.emit("agent", "", "deleteStack", stackName, new Ack() {
-            @Override
-            public void call(Object... args) {
-                deleteFuture.complete((JSONObject) args[0]);
-            }
-        });
-        
-        try {
-            JSONObject deleteResponse = deleteFuture.get(10, TimeUnit.SECONDS);
-            if (deleteResponse.getBoolean("ok")) {
-                System.out.println("✅ Cleaned up existing stack");
-            }
-        } catch (Exception e) {
-            System.out.println("⚠️  No existing stack to clean up");
-        }
-        
-        // Now create the stack
-        CompletableFuture<JSONObject> saveFuture = new CompletableFuture<>();
-        
-        // saveStack: (stackName, composeYAML, composeENV, isAdd)
-        sharedSocket.emit("agent", "", "saveStack", stackName, composeYAML, "", true, new Ack() {
+
+        System.out.println("Creating stack: " + stackName);
+        sharedSocket.emit("agent", "", "saveStack", stackName, composeContent, "", true, new Ack() {
             @Override
             public void call(Object... args) {
                 JSONObject response = (JSONObject) args[0];
-                saveFuture.complete(response);
+                createFuture.complete(response);
             }
         });
-        
-        JSONObject response = saveFuture.get(10, TimeUnit.SECONDS);
-        
-        System.out.println("Save stack response: " + response);
-        
-        assertThat(response.getBoolean("ok"))
-            .withFailMessage("Save stack failed: " + response.optString("msg", "Unknown error") + ". Full response: " + response)
-            .isTrue();
+
+        JSONObject response = createFuture.get(10, TimeUnit.SECONDS);
+        assertThat(response.getBoolean("ok")).isTrue();
+        System.out.println("✅ Stack created successfully");
     }
 
     @Test
-    @Order(22)
+    @Order(9)
     @DisplayName("Should get specific stack details")
     void shouldGetStack() throws Exception {
         loginAndConnect();
+        ensureStackExists("integration-test-stack");
         
-        String stackName = "test-integration-stack";
-        
-        CompletableFuture<JSONObject> getStackFuture = new CompletableFuture<>();
-        
+        CompletableFuture<JSONObject> getFuture = new CompletableFuture<>();
+        String stackName = "integration-test-stack";
+
         sharedSocket.emit("agent", "", "getStack", stackName, new Ack() {
             @Override
             public void call(Object... args) {
                 JSONObject response = (JSONObject) args[0];
-                getStackFuture.complete(response);
+                getFuture.complete(response);
             }
         });
-        
-        JSONObject response = getStackFuture.get(10, TimeUnit.SECONDS);
-        
-        System.out.println("Get stack response: " + response);
-        
+
+        JSONObject response = getFuture.get(10, TimeUnit.SECONDS);
         assertThat(response.getBoolean("ok")).isTrue();
         assertThat(response.has("stack")).isTrue();
+        System.out.println("✅ Stack details retrieved for: " + stackName);
     }
 
     @Test
-    @Order(23)
+    @Order(10)
     @DisplayName("Should delete a stack")
     void shouldDeleteStack() throws Exception {
         loginAndConnect();
-        
-        String stackName = "test-integration-stack";
+        ensureStackExists("integration-test-stack");
         
         CompletableFuture<JSONObject> deleteFuture = new CompletableFuture<>();
-        
+        String stackName = "integration-test-stack";
+
         sharedSocket.emit("agent", "", "deleteStack", stackName, new Ack() {
             @Override
             public void call(Object... args) {
@@ -408,27 +367,22 @@ class DockgeSocketIOTest extends IntegrationTestBase {
                 deleteFuture.complete(response);
             }
         });
-        
+
         JSONObject response = deleteFuture.get(10, TimeUnit.SECONDS);
-        
-        System.out.println("Delete stack response: " + response);
-        
         assertThat(response.getBoolean("ok")).isTrue();
+        System.out.println("✅ Stack deleted successfully");
     }
 
     @Test
-    @Order(24)
+    @Order(11)
     @DisplayName("Should start a stack")
     void shouldStartStack() throws Exception {
         loginAndConnect();
-        
-        String stackName = "test-integration-stack";
-        
-        // First, ensure the stack exists
-        ensureStackExists(stackName);
+        ensureStackExists("integration-test-stack");
         
         CompletableFuture<JSONObject> startFuture = new CompletableFuture<>();
-        
+        String stackName = "integration-test-stack";
+
         sharedSocket.emit("agent", "", "startStack", stackName, new Ack() {
             @Override
             public void call(Object... args) {
@@ -436,37 +390,22 @@ class DockgeSocketIOTest extends IntegrationTestBase {
                 startFuture.complete(response);
             }
         });
-        
-        JSONObject response = startFuture.get(30, TimeUnit.SECONDS); // Docker operations can be slow
-        
-        System.out.println("Start stack response: " + response);
-        
-        // Accept either success or "stack not found" as valid outcomes
-        boolean ok = response.getBoolean("ok");
-        String msg = response.optString("msg", "");
-        
-        if (!ok && msg.toLowerCase().contains("not found")) {
-            System.out.println("⚠️  Stack not found (acceptable - may have been deleted): " + msg);
-        } else {
-            assertThat(ok)
-                .withFailMessage("Start stack failed: " + msg)
-                .isTrue();
-        }
+
+        JSONObject response = startFuture.get(15, TimeUnit.SECONDS);
+        assertThat(response.getBoolean("ok")).isTrue();
+        System.out.println("✅ Stack start command accepted");
     }
 
     @Test
-    @Order(25)
+    @Order(12)
     @DisplayName("Should stop a stack")
     void shouldStopStack() throws Exception {
         loginAndConnect();
-        
-        String stackName = "test-integration-stack";
-        
-        // First, ensure the stack exists
-        ensureStackExists(stackName);
+        ensureStackExists("integration-test-stack");
         
         CompletableFuture<JSONObject> stopFuture = new CompletableFuture<>();
-        
+        String stackName = "integration-test-stack";
+
         sharedSocket.emit("agent", "", "stopStack", stackName, new Ack() {
             @Override
             public void call(Object... args) {
@@ -474,37 +413,22 @@ class DockgeSocketIOTest extends IntegrationTestBase {
                 stopFuture.complete(response);
             }
         });
-        
-        JSONObject response = stopFuture.get(30, TimeUnit.SECONDS);
-        
-        System.out.println("Stop stack response: " + response);
-        
-        // Accept either success or "stack not found" as valid outcomes
-        boolean ok = response.getBoolean("ok");
-        String msg = response.optString("msg", "");
-        
-        if (!ok && msg.toLowerCase().contains("not found")) {
-            System.out.println("⚠️  Stack not found (acceptable - may have been deleted): " + msg);
-        } else {
-            assertThat(ok)
-                .withFailMessage("Stop stack failed: " + msg)
-                .isTrue();
-        }
+
+        JSONObject response = stopFuture.get(15, TimeUnit.SECONDS);
+        assertThat(response.getBoolean("ok")).isTrue();
+        System.out.println("✅ Stack stop command accepted");
     }
 
     @Test
-    @Order(26)
+    @Order(13)
     @DisplayName("Should restart a stack")
     void shouldRestartStack() throws Exception {
         loginAndConnect();
-        
-        String stackName = "test-integration-stack";
-        
-        // First, ensure the stack exists
-        ensureStackExists(stackName);
+        ensureStackExists("integration-test-stack");
         
         CompletableFuture<JSONObject> restartFuture = new CompletableFuture<>();
-        
+        String stackName = "integration-test-stack";
+
         sharedSocket.emit("agent", "", "restartStack", stackName, new Ack() {
             @Override
             public void call(Object... args) {
@@ -512,37 +436,22 @@ class DockgeSocketIOTest extends IntegrationTestBase {
                 restartFuture.complete(response);
             }
         });
-        
-        JSONObject response = restartFuture.get(30, TimeUnit.SECONDS);
-        
-        System.out.println("Restart stack response: " + response);
-        
-        // Accept either success or "stack not found" as valid outcomes
-        boolean ok = response.getBoolean("ok");
-        String msg = response.optString("msg", "");
-        
-        if (!ok && msg.toLowerCase().contains("not found")) {
-            System.out.println("⚠️  Stack not found (acceptable - may have been deleted): " + msg);
-        } else {
-            assertThat(ok)
-                .withFailMessage("Restart stack failed: " + msg)
-                .isTrue();
-        }
+
+        JSONObject response = restartFuture.get(15, TimeUnit.SECONDS);
+        assertThat(response.getBoolean("ok")).isTrue();
+        System.out.println("✅ Stack restart command accepted");
     }
 
     @Test
-    @Order(27)
+    @Order(14)
     @DisplayName("Should update a stack")
     void shouldUpdateStack() throws Exception {
         loginAndConnect();
-        
-        String stackName = "test-integration-stack";
-        
-        // First, ensure the stack exists
-        ensureStackExists(stackName);
+        ensureStackExists("integration-test-stack");
         
         CompletableFuture<JSONObject> updateFuture = new CompletableFuture<>();
-        
+        String stackName = "integration-test-stack";
+
         sharedSocket.emit("agent", "", "updateStack", stackName, new Ack() {
             @Override
             public void call(Object... args) {
@@ -550,38 +459,25 @@ class DockgeSocketIOTest extends IntegrationTestBase {
                 updateFuture.complete(response);
             }
         });
-        
-        JSONObject response = updateFuture.get(30, TimeUnit.SECONDS);
-        
-        System.out.println("Update stack response: " + response);
-        
-        // Accept either success or "stack not found" as valid outcomes
-        boolean ok = response.getBoolean("ok");
-        String msg = response.optString("msg", "");
-        
-        if (!ok && msg.toLowerCase().contains("not found")) {
-            System.out.println("⚠️  Stack not found (acceptable - may have been deleted): " + msg);
-        } else {
-            assertThat(ok)
-                .withFailMessage("Update stack failed: " + msg)
-                .isTrue();
-        }
+
+        JSONObject response = updateFuture.get(15, TimeUnit.SECONDS);
+        assertThat(response.getBoolean("ok")).isTrue();
+        System.out.println("✅ Stack update command accepted");
     }
 
     // ========================================================================
-    // ADVANCED SETTINGS TESTS
+    // UTILITY TESTS
     // ========================================================================
 
     @Test
-    @Order(11)
-    @DisplayName("Should set settings")
+    @Order(15)
+    @DisplayName("Should update timezone setting")
     void shouldSetSettings() throws Exception {
         loginAndConnect();
         
+        CompletableFuture<JSONObject> getFuture = new CompletableFuture<>();
         CompletableFuture<JSONObject> setFuture = new CompletableFuture<>();
         
-        // Get current settings first
-        CompletableFuture<JSONObject> getFuture = new CompletableFuture<>();
         sharedSocket.emit("getSettings", new Ack() {
             @Override
             public void call(Object... args) {
@@ -610,12 +506,8 @@ class DockgeSocketIOTest extends IntegrationTestBase {
         assertThat(response).isNotNull();
     }
 
-    // ========================================================================
-    // UTILITY TESTS
-    // ========================================================================
-
     @Test
-    @Order(28)
+    @Order(16)
     @DisplayName("Should convert docker run to compose (composerize)")
     void shouldComposerize() throws Exception {
         loginAndConnect();
@@ -642,7 +534,7 @@ class DockgeSocketIOTest extends IntegrationTestBase {
     }
 
     @Test
-    @Order(12)
+    @Order(17)
     @DisplayName("Should change password")
     void shouldChangePassword() throws Exception {
         loginAndConnect();
@@ -688,7 +580,7 @@ class DockgeSocketIOTest extends IntegrationTestBase {
     // ========================================================================
 
     @Test
-    @Order(30)
+    @Order(18)
     @DisplayName("Should handle connection timeout to non-existent server")
     void shouldHandleConnectionTimeout() throws Exception {
         IO.Options options = new IO.Options();
