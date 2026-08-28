@@ -95,10 +95,11 @@ public class SpringBootDockgeSocketIOTest {
     public void shouldLoginWithValidCredentials() throws Exception {
         CompletableFuture<JSONObject> loginFuture = new CompletableFuture<>();
         
-        String username = "admin";
-        String password = "TestPassword123!";
+        JSONObject loginData = new JSONObject();
+        loginData.put("username", "admin");
+        loginData.put("password", "TestPassword123!");
 
-        sharedSocket.emit("login", username, password, new Ack() {
+        sharedSocket.emit("login", loginData, new Ack() {
             @Override
             public void call(Object... args) {
                 loginFuture.complete((JSONObject) args[0]);
@@ -116,10 +117,11 @@ public class SpringBootDockgeSocketIOTest {
     public void shouldRejectInvalidCredentials() throws Exception {
         CompletableFuture<JSONObject> loginFuture = new CompletableFuture<>();
         
-        String username = "admin";
-        String password = "wrongpassword";
+        JSONObject loginData = new JSONObject();
+        loginData.put("username", "admin");
+        loginData.put("password", "wrongpassword");
 
-        sharedSocket.emit("login", username, password, new Ack() {
+        sharedSocket.emit("login", loginData, new Ack() {
             @Override
             public void call(Object... args) {
                 loginFuture.complete((JSONObject) args[0]);
@@ -342,7 +344,11 @@ public class SpringBootDockgeSocketIOTest {
     public void shouldChangePassword() throws Exception {
         CompletableFuture<JSONObject> changeFuture = new CompletableFuture<>();
         
-        sharedSocket.emit("changePassword", "TestPassword123!", "NewPassword123!", new Ack() {
+        JSONObject passwordData = new JSONObject();
+        passwordData.put("currentPassword", "TestPassword123!");
+        passwordData.put("newPassword", "NewPassword123!");
+
+        sharedSocket.emit("changePassword", passwordData, new Ack() {
             @Override
             public void call(Object... args) {
                 changeFuture.complete((JSONObject) args[0]);
@@ -353,7 +359,10 @@ public class SpringBootDockgeSocketIOTest {
         assertThat(response.getBoolean("ok")).isTrue();
         
         // Revert password for other tests
-        sharedSocket.emit("changePassword", "NewPassword123!", "TestPassword123!", new Ack() {
+        JSONObject revertData = new JSONObject();
+        revertData.put("currentPassword", "NewPassword123!");
+        revertData.put("newPassword", "TestPassword123!");
+        sharedSocket.emit("changePassword", revertData, new Ack() {
             @Override
             public void call(Object... args) {
             }

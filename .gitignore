@@ -13,3 +13,7 @@ tasks/
 # Git only
 frontend-dist
 
+# Build output and logs
+target/
+logs/
+

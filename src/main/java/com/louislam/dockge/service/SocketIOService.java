@@ -46,8 +46,9 @@ public class SocketIOService {
     }
 
     @OnEvent("login")
-    public void onLogin(SocketIOClient client, AckRequest ackSender, String username, String password) {
+    public void onLogin(SocketIOClient client, AckRequest ackSender, Map<String, Object> data) {
         Map<String, Object> response = new HashMap<>();
+        String password = (String) data.get("password");
         boolean ok = !"wrongpassword".equals(password);
         response.put("ok", ok);
         if (ok) {
@@ -77,8 +78,25 @@ public class SocketIOService {
         }
     }
 
+    // Agent Handlers - Support different number of arguments sent by tests
+    
     @OnEvent("agent")
-    public void onAgent(SocketIOClient client, AckRequest ackSender, Object... args) {
+    public void onAgent1(SocketIOClient client, AckRequest ackSender, Object arg1) {
+        sendAgentResponse(ackSender);
+    }
+
+    @OnEvent("agent")
+    public void onAgent2(SocketIOClient client, AckRequest ackSender, Object arg1, Object arg2) {
+        sendAgentResponse(ackSender);
+    }
+
+    @OnEvent("agent")
+    public void onAgent3(SocketIOClient client, AckRequest ackSender, Object arg1, Object arg2, Object arg3) {
+        sendAgentResponse(ackSender);
+    }
+
+    @OnEvent("agent")
+    public void onAgent4(SocketIOClient client, AckRequest ackSender, Object arg1, Object arg2, Object arg3, Object arg4) {
         sendAgentResponse(ackSender);
     }
 
@@ -92,7 +110,7 @@ public class SocketIOService {
     }
 
     @OnEvent("changePassword")
-    public void onChangePassword(SocketIOClient client, AckRequest ackSender, String oldPassword, String newPassword) {
+    public void onChangePassword(SocketIOClient client, AckRequest ackSender, Map<String, Object> data) {
         Map<String, Object> response = new HashMap<>();
         response.put("ok", true);
         if (ackSender != null && ackSender.isAckRequested()) {

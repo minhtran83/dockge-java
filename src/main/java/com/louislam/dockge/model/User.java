@@ -13,7 +13,7 @@ import jakarta.persistence.Table;
  * Matches original Knex migration schema.
  */
 @Entity
-@Table(name = "`user`" ) // Quoted as user is a reserved word
+@Table(name = "`user`" )
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
